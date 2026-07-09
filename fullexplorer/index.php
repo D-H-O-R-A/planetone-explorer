@@ -4,7 +4,10 @@ namespace w8io;
 
 set_include_path( __DIR__ . PATH_SEPARATOR . __DIR__ . '/include' . PATH_SEPARATOR . get_include_path() );
 
-require_once 'config.php';
+if( file_exists( __DIR__ . '/config.php' ) )
+    require_once 'config.php';
+else
+    require_once 'config.sample.php';
 
 $z = (int)( $_COOKIE['z'] ?? 180 ); // TIMEZONE
 
