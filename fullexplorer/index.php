@@ -1,6 +1,9 @@
 <?php
 
 namespace w8io;
+
+set_include_path( __DIR__ . PATH_SEPARATOR . __DIR__ . '/include' . PATH_SEPARATOR . get_include_path() );
+
 require_once 'config.php';
 
 $z = (int)( $_COOKIE['z'] ?? 180 ); // TIMEZONE
