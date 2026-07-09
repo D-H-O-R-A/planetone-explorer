@@ -83,7 +83,7 @@ log_info "Updating package lists & checking system packages..."
 apt-get update -y
 
 log_info "Installing Nginx, PHP, PHP-FPM, SQLite3 and Certbot..."
-apt-get install -y nginx certbot python3-certbot-nginx php-fpm php-sqlite3 php-gmp php-curl php-cli php-mbstring php-xml php-zip zip unzip git
+apt-get install -y nginx certbot python3-certbot-nginx php-fpm php-sqlite3 php-gmp php-curl php-cli php-mbstring php-xml php-zip zip unzip git sqlite3
 
 # 2. Automatically find active PHP-FPM socket version
 log_info "Detecting active PHP-FPM socket version..."
@@ -108,18 +108,28 @@ DEPLOY_DIR="/var/www/${SUBDOMAIN}"
 log_info "Sincronizando arquivos do FullExplorer para o diretório seguro: ${DEPLOY_DIR}..."
 mkdir -p "${DEPLOY_DIR}"
 
-if [ ! -d "${DEPLOY_DIR}/db" ]; then
+if [ ! -d "${DEPLOY_DIR}/db" ] && [ ! -d "${DEPLOY_DIR}/var/db" ]; then
     cp -R "${FULLEXPLORER_DIR}/"* "${DEPLOY_DIR}/" 2>/dev/null || true
 else
-    # Prevent overwriting an existing blockchain index database if updating the codebase
+    # Prevent overwriting an existing blockchain database but sync everything else (including scam.csv)
     if command -v rsync &> /dev/null; then
-        rsync -a --exclude="db" --exclude="var" "${FULLEXPLORER_DIR}/" "${DEPLOY_DIR}/"
+        rsync -a --exclude="db/" --exclude="var/db/" "${FULLEXPLORER_DIR}/" "${DEPLOY_DIR}/"
     else
         # Fallback if rsync is missing
         for f in "${FULLEXPLORER_DIR}"/*; do
             base_f=$(basename "$f")
-            if [ "$base_f" != "db" ] && [ "$base_f" != "var" ]; then
-                cp -R "$f" "${DEPLOY_DIR}/" 2>/dev/null || true
+            if [ "$base_f" != "db" ]; then
+                if [ "$base_f" = "var" ]; then
+                    mkdir -p "${DEPLOY_DIR}/var"
+                    for vf in "$f"/*; do
+                        v_base=$(basename "$vf")
+                        if [ "$v_base" != "db" ]; then
+                            cp -R "$vf" "${DEPLOY_DIR}/var/" 2>/dev/null || true
+                        fi
+                    done
+                else
+                    cp -R "$f" "${DEPLOY_DIR}/" 2>/dev/null || true
+                fi
             fi
         done
     fi
@@ -142,7 +152,13 @@ fi
 log_info "Rodando Composer para instalar dependências e gerar o autoload.php..."
 php composer.phar update --ignore-platform-reqs --no-audit --no-interaction
 
-# Correct ownership again after composer runs to make sure all vendor files are owned by www-data
+# De-branding fallback nodes in composer library so it never connects to waves nodes
+log_info "Debranding default/fallback node addresses in PHP SDK libraries..."
+find "${DEPLOY_DIR}/vendor" -type f -name "*.php" -exec sed -i "s|nodes.wavesnodes.com|nodes.planetone.io|g" {} + 2>/dev/null || true
+find "${DEPLOY_DIR}/vendor" -type f -name "*.php" -exec sed -i "s|nodes-testnet.wavesnodes.com|nodes-testnet.planetone.io|g" {} + 2>/dev/null || true
+find "${DEPLOY_DIR}/vendor" -type f -name "*.php" -exec sed -i "s|testnode[0-9].wavesnodes.com|nodes-testnet.planetone.io|g" {} + 2>/dev/null || true
+
+# Correct ownership again after composer and search-and-replace
 chown -R www-data:www-data "${DEPLOY_DIR}"
 chmod -R 775 "${DEPLOY_DIR}"
 
