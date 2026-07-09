@@ -661,10 +661,36 @@ function prolog()
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="format-detection" content="telephone=no">
-        <title>%s</title>
+        <title>%1$s</title>
+        
+        <!-- Meta Tags Principais & SEO para Mecanismos de Busca -->
+        <meta name="description" content="Planet One Full Explorer - Indexador de blocos e transações on-chain de alta performance para a rede blockchain Planet One (PLO).">
+        <meta name="keywords" content="Planet One, PLO, Full Explorer, indexador, gRPC, RPC, blockchain, transações, blocos, cripto, sustentabilidade, tokenização, eRWA, créditos de carbono">
+        <meta name="author" content="Planet One">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://fullexplorer.planetone.io/">
+
+        <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+        <meta property="og:title" content="%1$s">
+        <meta property="og:description" content="Consulte endereços, transações, geradores de blocos e estatísticas em tempo real na rede Planet One (PLO).">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://fullexplorer.planetone.io/">
+        <meta property="og:image" content="https://fullexplorer.planetone.io/static/logo.png">
+        <meta property="og:site_name" content="Planet One Full Explorer">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="Planet One Full Explorer">
+
+        <!-- Twitter / Telegram -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@planetone_oficial">
+        <meta name="twitter:title" content="%1$s">
+        <meta name="twitter:description" content="Consulte endereços, transações, geradores de blocos e estatísticas em tempo real na rede Planet One (PLO).">
+        <meta name="twitter:image" content="https://fullexplorer.planetone.io/static/logo.png">
+
         <link rel="shortcut icon" href="/static/logo.png" type="image/x-icon">
         <link rel="stylesheet" href="/static/fonts.css">
-        <link rel="stylesheet" href="/static/static%s.css">
+        <link rel="stylesheet" href="/static/static%2$s.css">
         <script type="text/javascript" src="/static/jquery.js" charset="UTF-8"></script>
         <script type="text/javascript" src="/static/static.js" charset="UTF-8"></script>
     </head>
@@ -679,7 +705,7 @@ function prolog()
                 
                 <div class="search-container">
                     <form id="searchForm" onsubmit="handleSearch(event)">
-                        <input type="text" id="searchInput" placeholder="Search Address, Tx, Block, Asset..." class="search-input" value="%s">
+                        <input type="text" id="searchInput" placeholder="Search Address, Tx, Block, Asset..." class="search-input" value="%3$s">
                         <button type="submit" class="search-button">
                             <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.283-1.442l.742.042z" fill="currentColor"/></svg>
                         </button>
@@ -690,7 +716,7 @@ function prolog()
                     <a href="/GENERATORS" class="nav-link">Generators</a>
                     <a href="/ACTIVATION" class="nav-link">Activation</a>
                     <a href="https://explorer.planetone.io" class="nav-link external-link" target="_blank">Explorer &rarr;</a>
-                    <a id="L" href="" class="theme-toggle">%s</a>
+                    <a id="L" href="" class="theme-toggle">%4$s</a>
                 </nav>
             </div>
         </header>
