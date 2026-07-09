@@ -102,12 +102,34 @@ fi
 
 log_success "Detected active PHP-FPM socket: ${FPM_SOCKET}"
 
-# 3. Create or verify target deployment folders and permissions
+DEPLOY_DIR="/var/www/${SUBDOMAIN}"
+
+# 3. Create target deployment folders and safely copy indexer codebase
+log_info "Sincronizando arquivos do FullExplorer para o diretório seguro: ${DEPLOY_DIR}..."
+mkdir -p "${DEPLOY_DIR}"
+
+if [ ! -d "${DEPLOY_DIR}/db" ]; then
+    cp -R "${FULLEXPLORER_DIR}/"* "${DEPLOY_DIR}/" 2>/dev/null || true
+else
+    # Prevent overwriting an existing blockchain index database if updating the codebase
+    if command -v rsync &> /dev/null; then
+        rsync -a --exclude="db" --exclude="var" "${FULLEXPLORER_DIR}/" "${DEPLOY_DIR}/"
+    else
+        # Fallback if rsync is missing
+        for f in "${FULLEXPLORER_DIR}"/*; do
+            base_f=$(basename "$f")
+            if [ "$base_f" != "db" ] && [ "$base_f" != "var" ]; then
+                cp -R "$f" "${DEPLOY_DIR}/" 2>/dev/null || true
+            fi
+        done
+    fi
+fi
+
 log_info "Setting correct folder permissions for web server access..."
-# Ensure SQLite directory exists and is writable by nginx (www-data)
-mkdir -p "${FULLEXPLORER_DIR}/var/db"
-chown -R www-data:www-data "${FULLEXPLORER_DIR}"
-chmod -R 775 "${FULLEXPLORER_DIR}"
+mkdir -p "${DEPLOY_DIR}/var/db"
+mkdir -p "${DEPLOY_DIR}/db"
+chown -R www-data:www-data "${DEPLOY_DIR}"
+chmod -R 775 "${DEPLOY_DIR}"
 
 # 4. Generate Nginx Server Block Configuration
 log_info "Creating Nginx configuration block for: ${SUBDOMAIN}..."
@@ -119,7 +141,7 @@ server {
     listen 80;
     listen [::]:80;
     server_name ${SUBDOMAIN};
-    root ${FULLEXPLORER_DIR};
+    root ${DEPLOY_DIR};
 
     index index.php index.html;
 
@@ -201,8 +223,8 @@ After=network.target
 Type=simple
 User=www-data
 Group=www-data
-WorkingDirectory=${FULLEXPLORER_DIR}
-ExecStart=/usr/bin/php -f ${FULLEXPLORER_DIR}/w8_updater.php
+WorkingDirectory=${DEPLOY_DIR}
+ExecStart=/usr/bin/php -f ${DEPLOY_DIR}/w8_updater.php
 Restart=always
 RestartSec=10
 StandardOutput=syslog
@@ -224,8 +246,8 @@ After=network.target
 Type=simple
 User=www-data
 Group=www-data
-WorkingDirectory=${FULLEXPLORER_DIR}
-ExecStart=/usr/bin/php -f ${FULLEXPLORER_DIR}/w8_updater_headers.php
+WorkingDirectory=${DEPLOY_DIR}
+ExecStart=/usr/bin/php -f ${DEPLOY_DIR}/w8_updater_headers.php
 Restart=always
 RestartSec=10
 StandardOutput=syslog
@@ -254,7 +276,7 @@ echo "======================================================================"
 echo "    PLANET ONE FULLEXPLORER SERVER DEPLOYMENT COMPLETED!             "
 echo "======================================================================"
 echo " URL:         https://${SUBDOMAIN}"
-echo " Path:        ${FULLEXPLORER_DIR}"
+echo " Path:        ${DEPLOY_DIR}"
 echo " PHP-FPM:     ${FPM_SOCKET}"
 echo " Status:      Active & Running"
 echo "======================================================================"
