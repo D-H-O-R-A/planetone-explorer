@@ -14,7 +14,10 @@
     "start:fullexplorer": "bash ./scripts/start-fullexplorer-localhost.sh",
     "setup:fullexplorer": "bash ./scripts/setup-fullexplorer.sh",
     "deploy:fullexplorer": "bash ./scripts/deploy-fullexplorer-nginx.sh",
-    "logs:fullexplorer": "tail -f ./fullexplorer/fullexplorer_local.log"
+    "logs:fullexplorer": "tail -f ./fullexplorer/fullexplorer_local.log",
+    "secrets:set": "firebase functions:secrets:set PLANETONE_PRIVATE_KEY PLANETONE_NODE_URL PLANETONE_CHAIN_ID",
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:rules": "firebase deploy --only database"
   },
   "dependencies": {
     "@better2better/waves-node-api-js": "^1.4.1",

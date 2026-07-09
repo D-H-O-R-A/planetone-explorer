@@ -9,10 +9,17 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "function": "faucet"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
     ]
+  },
+  "database": {
+    "rules": "database.rules.json"
   },
   "functions": [
     {

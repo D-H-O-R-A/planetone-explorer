@@ -43,11 +43,14 @@ export const convertEthTxToWaves = (txId: string): string => {
 
 // Environment detection
 export const isTestnet = () => {
+  if (window.location.search.includes('testnet=true')) {
+    localStorage.setItem('network_mode', 'testnet');
+    return true;
+  }
   const mode = localStorage.getItem('network_mode');
   if (mode === 'testnet') return true;
   if (mode === 'mainnet') return false;
-  return window.location.hostname.includes('testnet') || 
-         window.location.search.includes('testnet=true');
+  return window.location.hostname.includes('testnet');
 };
 
 // Get appropriate URLs based on environment and local storage

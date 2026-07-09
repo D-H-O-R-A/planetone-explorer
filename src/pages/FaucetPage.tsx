@@ -87,7 +87,7 @@ const FaucetPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://faucet-j7f7udyx3a-uc.a.run.app', {
+      const response = await fetch('/api/faucet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
