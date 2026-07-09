@@ -51,6 +51,15 @@ done
 log_success "All system dependencies are present."
 
 # 2. Clone the D-H-O-R-A/planetone-explorer repository if not already cloned
+if [ -d "$TARGET_DIR" ]; then
+    echo -e "${color_warning}A instalação anterior do FullExplorer foi detectada em:${color_reset} $TARGET_DIR"
+    read -p "Deseja APAGAR a instalação anterior e fazer uma instalação 100% LIMPA? (y/N): " CLEAN_CHOICE
+    if [[ "$CLEAN_CHOICE" =~ ^[Yy]$ ]]; then
+        log_info "Apagando diretório anterior..."
+        rm -rf "$TARGET_DIR"
+    fi
+fi
+
 if [ ! -d "$TARGET_DIR" ]; then
     log_info "Cloning D-H-O-R-A/planetone-explorer blockchain indexer into '${TARGET_DIR}'..."
     git clone https://github.com/D-H-O-R-A/planetone-explorer.git "$TARGET_DIR"
@@ -185,3 +194,27 @@ echo " Run indexer: php -f ${TARGET_DIR}/w8io.php"
 echo " Run webserver: php -S localhost:8080 -t ${TARGET_DIR}"
 echo "======================================================================"
 echo -e "${color_reset}"
+
+echo -e "\n${color_bold}Deseja configurar o domínio de produção, o Nginx e o SSL (Certbot) agora?${color_reset}"
+read -p "Configurar Nginx & SSL agora? (y/N): " DEPLOY_CHOICE
+if [[ "$DEPLOY_CHOICE" =~ ^[Yy]$ ]]; then
+    read -p "Digite o domínio principal (ex: planetone.io): " DEPLOY_DOMAIN
+    read -p "Esta instalação é para a rede de Testnet? (y/N): " DEPLOY_TESTNET
+    
+    IS_TESTNET_FLAG=""
+    if [[ "$DEPLOY_TESTNET" =~ ^[Yy]$ ]]; then
+        IS_TESTNET_FLAG="--testnet"
+    fi
+    
+    log_info "Iniciando script de deploy do Nginx e Certbot..."
+    if [ -f "${SCRIPT_DIR}/deploy-fullexplorer-nginx.sh" ]; then
+        if [ "$EUID" -ne 0 ]; then
+            log_warning "O script de deploy do Nginx precisa de privilégios de root. Rodando com sudo..."
+            sudo bash "${SCRIPT_DIR}/deploy-fullexplorer-nginx.sh" "$DEPLOY_DOMAIN" $IS_TESTNET_FLAG
+        else
+            bash "${SCRIPT_DIR}/deploy-fullexplorer-nginx.sh" "$DEPLOY_DOMAIN" $IS_TESTNET_FLAG
+        fi
+    else
+        log_error "Script deploy-fullexplorer-nginx.sh não foi encontrado!"
+    fi
+fi

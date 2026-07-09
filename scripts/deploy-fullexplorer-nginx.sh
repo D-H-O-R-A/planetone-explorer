@@ -43,19 +43,26 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Verify input domain
-if [ $# -lt 1 ]; then
-    log_error "Missing domain name argument."
-    echo -e "Usage: sudo bash deploy-fullexplorer-nginx.sh <main_domain_name> [--testnet]"
-    echo -e "Example: sudo bash deploy-fullexplorer-nginx.sh planetone.io"
-    exit 1
-fi
-
-MAIN_DOMAIN="$1"
+MAIN_DOMAIN=""
 IS_TESTNET=false
 
-if [ $# -eq 2 ] && [ "$2" = "--testnet" ]; then
-    IS_TESTNET=true
+# Verify input domain
+if [ $# -lt 1 ]; then
+    log_warning "Nenhum domínio foi informado nos argumentos."
+    read -p "Digite o domínio principal para o deploy (ex: planetone.io): " MAIN_DOMAIN
+    if [ -z "$MAIN_DOMAIN" ]; then
+        log_error "O domínio não pode estar em branco."
+        exit 1
+    fi
+    read -p "Este deploy é para a rede de Testnet? (y/N): " DEPLOY_TESTNET_CHOICE
+    if [[ "$DEPLOY_TESTNET_CHOICE" =~ ^[Yy]$ ]]; then
+        IS_TESTNET=true
+    fi
+else
+    MAIN_DOMAIN="$1"
+    if [ $# -eq 2 ] && [ "$2" = "--testnet" ]; then
+        IS_TESTNET=true
+    fi
 fi
 
 # Determine subdomain and pathing
