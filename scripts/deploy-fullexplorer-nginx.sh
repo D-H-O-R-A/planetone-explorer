@@ -178,11 +178,7 @@ server {
 
     # Set maximum upload size if needed
     client_max_body_size 32M;
-
-    # CORS Headers configuration
-    add_header 'Access-Control-Allow-Origin' '*' always;
-    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
-    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+    # CORS Headers are managed directly by PHP index.php for API endpoints
 
     location / {
         # Redirect all requests to index.php if file/dir not found (standard router)
