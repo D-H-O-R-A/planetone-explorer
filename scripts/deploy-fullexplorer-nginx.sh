@@ -131,6 +131,21 @@ mkdir -p "${DEPLOY_DIR}/db"
 chown -R www-data:www-data "${DEPLOY_DIR}"
 chmod -R 775 "${DEPLOY_DIR}"
 
+# 3.5 Install/Verify Composer dependencies inside the production deployment directory
+log_info "Verificando e instalando dependências do Composer em: ${DEPLOY_DIR}..."
+cd "${DEPLOY_DIR}"
+if [ ! -f "composer.phar" ]; then
+    log_info "Baixando o binário do Composer (composer.phar)..."
+    curl -sS https://getcomposer.org/installer | php
+fi
+
+log_info "Rodando Composer para instalar dependências e gerar o autoload.php..."
+php composer.phar update --ignore-platform-reqs --no-audit --no-interaction
+
+# Correct ownership again after composer runs to make sure all vendor files are owned by www-data
+chown -R www-data:www-data "${DEPLOY_DIR}"
+chmod -R 775 "${DEPLOY_DIR}"
+
 # 4. Generate Nginx Server Block Configuration
 log_info "Creating Nginx configuration block for: ${SUBDOMAIN}..."
 
