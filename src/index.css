@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* CLEAN LIGHT ECO-CORPORATE THEME (DEFAULT) */
+    --background: 210 40% 98%; /* slate-50 with green-blue tint */
+    --foreground: 222 47% 11%; /* slate-900 */
+
+    /* Muted tones */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    /* Cosmic Planet Blue - Primary */
+    --primary: 215 100% 50%; /* Deep Blue */
+    --primary-foreground: 210 40% 98%;
+
+    /* Leaf Green - Secondary */
+    --secondary: 140 85% 40%; /* Strong Leaf Green */
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 215 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Explorer dual accents: Planet Blue & Leaf Green */
+    --explorer-primary: 215 100% 50%;
+    --explorer-secondary: 140 85% 40%;
+  }
+
+  .dark {
+    /* COSMIC DARK SPACE THEME */
+    --background: 222 47% 2%;
+    --foreground: 210 40% 98%;
+
+    /* Muted space tones */
+    --muted: 220 25% 9%;
+    --muted-foreground: 215 15% 75%;
+
+    --popover: 222 47% 3%;
+    --popover-foreground: 210 40% 98%;
+
+    --card: 222 47% 3%;
+    --card-foreground: 210 40% 98%;
+
+    --border: 217 30% 12%;
+    --input: 217 30% 12%;
+
+    /* Cosmic Planet Blue - Primary */
+    --primary: 215 100% 55%;
+    --primary-foreground: 222 47% 2%;
+
+    /* Leaf Green - Secondary */
+    --secondary: 140 100% 45%;
+    --secondary-foreground: 222 47% 2%;
+
+    --accent: 215 40% 12%;
+    --accent-foreground: 215 100% 55%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 215 100% 55%;
+
+    /* Explorer dual accents: Planet Blue & Leaf Green */
+    --explorer-primary: 215 100% 55%;
+    --explorer-secondary: 140 100% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Exo 2', sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/60 dark:bg-black/40 backdrop-blur-md border border-primary/10 dark:border-primary/15 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.4)] hover:border-primary/30 dark:hover:border-primary/30 transition-all duration-300;
+  }
+
+  .terminal-border {
+    @apply border border-primary/10 dark:border-primary/20 shadow-[0_0_20px_-3px_rgba(0,102,255,0.05)] dark:shadow-[0_0_20px_-3px_rgba(0,102,255,0.15)] bg-white/70 dark:bg-black/60 backdrop-blur-md;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(215,100%,55%)] to-[hsl(140,100%,45%)];
+  }
+
+  .title-tech {
+    @apply font-mono tracking-wide;
+  }
+
+  .neon-text {
+    @apply text-explorer-primary drop-shadow-[0_0_8px_rgba(0,102,255,0.5)];
+  }
+
+  .neon-button {
+    @apply border-explorer-primary text-explorer-primary hover:bg-explorer-primary/10 transition-colors;
+  }
+
+  .data-flow {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 102, 255, 0.03) 75%, rgba(0, 102, 255, 0.07) 100%);
+    background-size: 10px 10px;
+    animation: flow 10s linear infinite;
+  }
+
+  .cyber-badge {
+    @apply bg-black/60 border border-primary/20 text-primary text-xs px-2 py-0.5;
+  }
+
+  .tech-card {
+    @apply bg-black/20 border border-primary/10 rounded-xl overflow-hidden;
+  }
+
+  .section-transition {
+    transition: all 0.3s ease;
+  }
+
+  .animate-pulse-light {
+    animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-text-glow {
+    animation: text-glow 2s ease-in-out infinite alternate;
+  }
+  
+  .break-all {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .break-words {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  @media (max-width: 640px) {
+    .mobile-break {
+      word-break: break-all;
+      overflow-wrap: break-word;
+      line-height: 1.4;
+    }
+    
+    .mobile-text-wrap {
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6, p, span, div, td, th, label {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes text-glow {
+  from {
+    text-shadow: 0 0 5px rgba(0,102,255,0.7);
+  }
+  to {
+    text-shadow: 0 0 15px rgba(0,102,255,1);
+  }
+}
+
+@keyframes flow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+.mobile-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.force-wrap {
+  word-break: break-all !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .responsive-padding {
+    padding: 0.75rem;
+  }
+  
+  .responsive-text {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}

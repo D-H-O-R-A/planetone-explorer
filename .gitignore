@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies and Builds
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Planet One Full Explorer (w8io PHP/SQLite) local folders
+fullexplorer/var/
+fullexplorer/vendor/
+fullexplorer/config.php
+fullexplorer/*.log
+fullexplorer/composer.phar
+fullexplorer/composer.lock
