@@ -50,10 +50,10 @@ define( 'W8IO_DB_DIR', __DIR__ . '/var/db/' );
 define( 'W8IO_DB_PATH', W8IO_DB_DIR . 'blockchain.sqlite3' );
 define( 'W8DB', 'sqlite:' . W8IO_DB_PATH );
 
-define( 'W8IO_NODES', [ 'http://127.0.0.1:6869', 'https://nodes.wavesnodes.com' ] );
-define( 'W8IO_MULTI_NODES', [ 'http://127.0.0.1:6869', 'https://nodes.wavesnodes.com' ] );
-define( 'W8IO_MATCHER', 'https://matcher.waves.exchange' );
-define( 'W8IO_NETWORK', 'W' ); // 'W' -- mainnet, 'T' -- testnet
+define( 'W8IO_NODES', [ 'http://127.0.0.1:6869', 'https://nodes.planetone.io' ] );
+define( 'W8IO_MULTI_NODES', [ 'http://127.0.0.1:6869', 'https://nodes.planetone.io' ] );
+define( 'W8IO_MATCHER', 'https://matcher.planetone.io' );
+define( 'W8IO_NETWORK', 'P' ); // 'W' -- mainnet, 'T' -- testnet
 define( 'W8IO_ROOT', '/' );
 define( 'W8IO_MAX_UPDATE_BATCH', 1 ); // set more on when on a local node
 define( 'W8IO_UPDATE_DELAY', 1 );

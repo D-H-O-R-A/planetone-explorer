@@ -91,19 +91,6 @@ define( 'W8IO_LIMIT', 100 );
 EOF
 fi
 
-# Apply direct configuration changes in config.php
-if [ -f "config.php" ]; then
-    # Replace Nodes URL
-    sed -i "s|https://nodes.wavesnodes.com|https://nodes.planetone.io|g" config.php
-    sed -i "s|nodes.wavesnodes.com|nodes.planetone.io|g" config.php
-    sed -i "s|'W'|'P'|g" config.php # Rebrand Chain network character 'W' to 'P'
-    sed -i "s|\"W\"|\"P\"|g" config.php
-    sed -i "s|'Waves'|'Planet One'|g" config.php
-    sed -i "s|'WAVES'|'PLO'|g" config.php
-    sed -i "s|\"WAVES\"|\"PLO\"|g" config.php
-    log_success "Updated config.php with Planet One node endpoints and chain specifications."
-fi
-
 # 4. Global Debranding of Waves & AMZ
 log_info "Running global search-and-replace to de-brand 'Waves' / 'AMZ' in all indexer source files..."
 
