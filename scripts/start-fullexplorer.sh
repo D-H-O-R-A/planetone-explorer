@@ -32,7 +32,7 @@ log_error() {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FULLEXPLORER_DIR="${SCRIPT_DIR}/fullexplorer"
+FULLEXPLORER_DIR="${SCRIPT_DIR}/../fullexplorer"
 
 echo -e "${color_primary}"
 echo "======================================================================"

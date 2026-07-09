@@ -66,7 +66,7 @@ else
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FULLEXPLORER_DIR="$(cd "${SCRIPT_DIR}/fullexplorer" && pwd)"
+FULLEXPLORER_DIR="$(cd "${SCRIPT_DIR}/../fullexplorer" && pwd)"
 
 log_info "Deploying FullExplorer API Service to: https://${SUBDOMAIN}"
 log_info "Local FullExplorer directory: ${FULLEXPLORER_DIR}"
