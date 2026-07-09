@@ -16,7 +16,7 @@ O frontend é a interface premium do usuário para inspecionar blocos, transaç�
 * **Barra de Dados Unificada (*Sleek Data Bar*)**: Exibição simétrica em 6 colunas de estatísticas de rede em tempo real.
 * **Seção de Transações Pendentes (Mempool)**: Monitoramento em tempo real de transações na fila do nó aguardando inclusão em novos blocos.
 * **Integração de APIs Inteligente**: Consome gRPC/RPC diretamente do nó da rede e possui fallback automático para a API do Full Explorer SQL para pesquisas retroativas, contagens de endereços e transações totais.
-* **Mapeador EVM/Waves**: Conversor visual de endereços de formato Waves/Bech32 para EVM/Hexadecimal para interações de contratos inteligentes.
+* **Mapeador EVM/PLO**: Conversor visual de endereços de formato PLO/Bech32 para EVM/Hexadecimal para interações de contratos inteligentes.
 * **Visualização de Contratos Inteligentes**: Interface dedicada para verificar scripts Ride instalados e suas chamadas de função.
 
 ### 💻 Como Iniciar o Frontend Localmente
