@@ -117,7 +117,7 @@ NGINX_CONF="/etc/nginx/sites-available/${SUBDOMAIN}"
 cat << EOF > "$NGINX_CONF"
 server {
     listen 80;
-    listen [::]: 80;
+    listen [::]:80;
     server_name ${SUBDOMAIN};
     root ${FULLEXPLORER_DIR};
 

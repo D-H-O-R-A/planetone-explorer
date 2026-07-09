@@ -121,25 +121,13 @@ fi
 PORT=8080
 LOG_FILE="${FULLEXPLORER_DIR}/fullexplorer_local.log"
 
-# Clean up any process already occupying the target port before starting
+# Search for the next available port if default is busy, rather than force-killing other services
 if lsof -i :$PORT -t &>/dev/null || fuser $PORT/tcp &>/dev/null; then
-    log_warning "Port $PORT is already in use! Attempting to terminate the occupying process..."
-    OCCUPYING_PID=$(lsof -t -i:$PORT 2>/dev/null)
-    if [ ! -z "$OCCUPYING_PID" ]; then
-        kill -9 $OCCUPYING_PID 2>/dev/null || true
-    fi
-    fuser -k $PORT/tcp 2>/dev/null || true
-    
-    # Check if we successfully freed the port
-    sleep 1
-    if lsof -i :$PORT -t &>/dev/null; then
-        log_error "Failed to free port $PORT! The process might be owned by another user (e.g. root/www-data)."
-        log_warning "DIAGNÓSTICO: Por favor, execute o comando abaixo no seu terminal para liberar a porta $PORT:"
-        echo -e "${color_bold}  sudo fuser -k ${PORT}/tcp${color_reset}"
-        exit 1
-    else
-        log_success "Successfully freed port $PORT!"
-    fi
+    log_warning "Port $PORT is already in use! Finding an available port..."
+    while lsof -i :$PORT -t &>/dev/null || fuser $PORT/tcp &>/dev/null; do
+        PORT=$((PORT + 1))
+    done
+    log_success "Found available free port: $PORT"
 fi
 
 # Clean old process if exists
@@ -211,8 +199,8 @@ fi
 log_info "Verifying API server status and checking blockchain synchronization..."
 
 # Run PHP helper script to query API and Node height
-SYNC_CHECK=$(php -r '
-    $stats_url = "http://127.0.0.1:8080/api/stats";
+SYNC_CHECK=$(PORT=$PORT php -r '
+    $stats_url = "http://127.0.0.1:" . getenv("PORT") . "/api/stats";
     $node_url = "https://nodes.planetone.io/blocks/height";
     
     // Fetch local stats
@@ -262,7 +250,7 @@ case "$SYNC_CHECK" in
         log_warning "STATUS: Sincronização pendente. Não foi possível consultar a altura do nó remoto, mas o indexador local está no bloco $local_h."
         ;;
     API_ERROR)
-        log_error "Falha ao conectar na API local do FullExplorer em http://127.0.0.1:8080/api/stats."
+        log_error "Falha ao conectar na API local do FullExplorer em http://127.0.0.1:${PORT}/api/stats."
         log_error "Por favor, verifique o arquivo de log para diagnosticar o erro: $LOG_FILE"
         exit 1
         ;;
