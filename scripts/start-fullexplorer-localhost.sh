@@ -69,17 +69,22 @@ fi
 # Verify required PHP extensions are present
 log_info "Verificando módulos requeridos do PHP..."
 MISSING_EXTS=()
-for ext in gmp sqlite3 curl mbstring xml; do
+for ext in gmp sqlite3 curl mbstring xml zip; do
     if ! php -m | grep -qi "$ext"; then
         MISSING_EXTS+=("php-$ext")
     fi
 done
 
+# Check if system unzip command is available
+if ! command -v unzip &> /dev/null; then
+    MISSING_EXTS+=("unzip" "zip")
+fi
+
 if [ ${#MISSING_EXTS[@]} -gt 0 ]; then
-    log_warning "Os seguintes módulos PHP necessários estão faltando no seu sistema: ${MISSING_EXTS[*]}"
-    log_info "Tentando instalar os módulos ausentes automaticamente usando sudo..."
+    log_warning "Os seguintes módulos PHP ou ferramentas necessárias estão faltando: ${MISSING_EXTS[*]}"
+    log_info "Tentando instalar automaticamente usando sudo..."
     if sudo apt-get update && sudo apt-get install -y "${MISSING_EXTS[@]}"; then
-        log_success "Módulos PHP instalados com sucesso!"
+        log_success "Módulos e ferramentas instalados com sucesso!"
     else
         log_error "Não foi possível instalar os módulos de forma automática."
         log_warning "Por favor, execute o comando manualmente no seu terminal:"

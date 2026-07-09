@@ -76,7 +76,7 @@ log_info "Updating package lists & checking system packages..."
 apt-get update -y
 
 log_info "Installing Nginx, PHP, PHP-FPM, SQLite3 and Certbot..."
-apt-get install -y nginx certbot python3-certbot-nginx php-fpm php-sqlite3 php-gmp php-curl php-cli php-mbstring php-xml unzip git
+apt-get install -y nginx certbot python3-certbot-nginx php-fpm php-sqlite3 php-gmp php-curl php-cli php-mbstring php-xml php-zip zip unzip git
 
 # 2. Automatically find active PHP-FPM socket version
 log_info "Detecting active PHP-FPM socket version..."
