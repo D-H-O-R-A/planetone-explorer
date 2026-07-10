@@ -265,7 +265,7 @@ if( $address === 'api' )
         if( false === $query->execute( [ ':idA' => $idA, ':idB' => $idB ] ) )
             apiexit( 500, [ 'code' => 500, 'message' => 'query failed' ] );
 
-        $trades = $query->fetchAll();
+        $trades = $query->fetchAll( \PDO::FETCH_ASSOC );
         $json = [];
         foreach( $trades as $row )
         {
