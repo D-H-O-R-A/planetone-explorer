@@ -267,13 +267,29 @@ if( $address === 'api' )
 
         $trades = $query->fetchAll( \PDO::FETCH_ASSOC );
         $json = [];
+        
+        // Case-insensitive and index-resilient column mapper helper
+        $val = function( $row, $key, $idx ) {
+            if( isset( $row[$key] ) && $row[$key] !== null ) return $row[$key];
+            $keyUpper = strtoupper( $key );
+            if( isset( $row[$keyUpper] ) && $row[$keyUpper] !== null ) return $row[$keyUpper];
+            if( isset( $row[$idx] ) ) return $row[$idx];
+            return null;
+        };
+
         foreach( $trades as $row )
         {
-            $txkey = (int)$row['txkey'];
+            $txkey = $val( $row, 'txkey', 0 );
+            if( $txkey === null ) continue;
+            
+            $txkey = (int)$txkey;
             $txid = $RO->getTxIdByTxKey( $txkey );
             
-            $sellerId = $row['seller'] !== null ? (int)$row['seller'] : null;
-            $buyerId = $row['buyer'] !== null ? (int)$row['buyer'] : null;
+            $sellerId = $val( $row, 'seller', 8 );
+            $buyerId = $val( $row, 'buyer', 9 );
+            
+            $sellerId = $sellerId !== null ? (int)$sellerId : null;
+            $buyerId = $buyerId !== null ? (int)$buyerId : null;
             
             $sellerAddr = $sellerId !== null ? $RO->getAddressById( $sellerId ) : '';
             $buyerAddr = $buyerId !== null ? $RO->getAddressById( $buyerId ) : '';
@@ -281,15 +297,15 @@ if( $address === 'api' )
             $json[] = [
                 'id' => $txid,
                 'txkey' => $txkey,
-                'price' => (int)$row['price'],
-                'amount' => (int)$row['amount'],
-                'total' => (int)$row['total'],
-                'side' => $row['side'],
-                'timestamp' => (int)$row['timestamp'],
+                'price' => (int)$val( $row, 'price', 3 ),
+                'amount' => (int)$val( $row, 'amount', 4 ),
+                'total' => (int)$val( $row, 'total', 5 ),
+                'side' => $val( $row, 'side', 6 ),
+                'timestamp' => (int)$val( $row, 'timestamp', 7 ),
                 'seller' => $sellerAddr,
                 'buyer' => $buyerAddr,
-                'amount_asset' => (int)$row['amount_asset'],
-                'price_asset' => (int)$row['price_asset']
+                'amount_asset' => (int)$val( $row, 'amount_asset', 1 ),
+                'price_asset' => (int)$val( $row, 'price_asset', 2 )
             ];
         }
 
