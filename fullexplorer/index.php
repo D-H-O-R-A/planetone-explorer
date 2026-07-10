@@ -260,6 +260,7 @@ if( $address === 'api' )
             ORDER BY txkey DESC 
             LIMIT 100
         ' );
+        $query->setFetchMode( \PDO::FETCH_ASSOC );
         
         if( false === $query->execute( [ ':idA' => $idA, ':idB' => $idB ] ) )
             apiexit( 500, [ 'code' => 500, 'message' => 'query failed' ] );
