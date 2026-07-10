@@ -225,7 +225,10 @@ const RankingPage: React.FC = () => {
   }, [ranking, assetMeta]);
 
   return (
-    <MotionContainer className="w-full max-w-6xl mx-auto space-y-8 px-2 md:px-0 animate-fade-in pb-16">
+    <MotionContainer 
+      animateOnMount={true}
+      className="w-full max-w-6xl mx-auto space-y-8 px-2 md:px-0 animate-fade-in pb-16"
+    >
       
       {/* Header Block */}
       <MotionChild className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">

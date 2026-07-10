@@ -12,6 +12,7 @@ type MotionContainerProps = {
   triggerOnce?: boolean;
   staggerChildren?: boolean;
   staggerDelay?: number;
+  animateOnMount?: boolean;
 };
 
 export const MotionContainer: React.FC<MotionContainerProps> = ({
@@ -23,6 +24,7 @@ export const MotionContainer: React.FC<MotionContainerProps> = ({
   triggerOnce = true,
   staggerChildren = false,
   staggerDelay = 0.1,
+  animateOnMount = false,
 }) => {
   const getDirectionalVariants = () => {
     const distance = 30;
@@ -56,8 +58,8 @@ export const MotionContainer: React.FC<MotionContainerProps> = ({
     <motion.div
       className={cn(className)}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: triggerOnce, margin: "-5%" }}
+      {...(animateOnMount ? { animate: "visible" } : { whileInView: "visible" })}
+      viewport={animateOnMount ? undefined : { once: triggerOnce, margin: "-5%" }}
       variants={getDirectionalVariants()}
     >
       {children}

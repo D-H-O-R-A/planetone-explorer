@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { 
   Wifi, 
   WifiOff, 
+  AlertCircle,
   Clock, 
   Settings, 
   ArrowUp, 

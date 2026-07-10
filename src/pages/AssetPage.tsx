@@ -6,7 +6,7 @@ import {
   Loader2, ArrowLeft, Trophy, Medal, Wallet, Copy, Check, 
   ExternalLink, Search, RefreshCw, Flame, CheckCircle, Trees, 
   Info, Sparkles, TrendingUp, HelpCircle, AlertCircle,
-  Globe, Twitter, Send, Github, FileText
+  Globe, Twitter, Send, Github, FileText, Coins
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -245,7 +245,10 @@ const AssetPage = () => {
   const assetTotalSupply = asset ? asset.quantity / Math.pow(10, assetDecimals) : 0;
 
   return (
-    <MotionContainer className="min-h-screen px-4 md:px-8 py-8 pb-24 md:pb-12 max-w-6xl mx-auto space-y-8">
+    <MotionContainer 
+      animateOnMount={true}
+      className="min-h-screen px-4 md:px-8 py-8 pb-24 md:pb-12 max-w-6xl mx-auto space-y-8"
+    >
       
       {/* Header and navigation */}
       <MotionChild className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
