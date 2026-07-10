@@ -228,6 +228,63 @@ if( $address === 'api' )
         apiexit( 200, $diff );
     }
     else
+    if( $f === 'market' && $arg === 'trades' && $arg2 !== false && $arg3 !== false )
+    {
+        require_once 'include/RO.php';
+        $RO = new RO( W8DB );
+
+        $amountAsset = $arg2;
+        $priceAsset = $arg3;
+
+        $amountAssetId = ( $amountAsset === 'Waves' || $amountAsset === 'PLO' || $amountAsset === 'WAVES' ) ? 0 : $RO->getIdByAsset( $amountAsset );
+        $priceAssetId = ( $priceAsset === 'Waves' || $priceAsset === 'PLO' || $priceAsset === 'WAVES' ) ? 0 : $RO->getIdByAsset( $priceAsset );
+
+        if( $amountAssetId === false || $priceAssetId === false )
+        {
+            apiexit( 404, [ 'code' => 404, 'message' => 'asset not found' ] );
+        }
+
+        // Fetch the trades!
+        $query = $RO->db->db->prepare( '
+            SELECT txkey, price, amount, total, side, timestamp, seller, buyer
+            FROM market_trades 
+            WHERE amount_asset = :amount_asset AND price_asset = :price_asset 
+            ORDER BY txkey DESC 
+            LIMIT 100
+        ' );
+        
+        if( false === $query->execute( [ ':amount_asset' => $amountAssetId, ':price_asset' => $priceAssetId ] ) )
+            apiexit( 500, [ 'code' => 500, 'message' => 'query failed' ] );
+
+        $trades = $query->fetchAll();
+        $json = [];
+        foreach( $trades as $row )
+        {
+            $txkey = (int)$row['txkey'];
+            $txid = $RO->getTxIdByTxKey( $txkey );
+            
+            $sellerId = $row['seller'] !== null ? (int)$row['seller'] : null;
+            $buyerId = $row['buyer'] !== null ? (int)$row['buyer'] : null;
+            
+            $sellerAddr = $sellerId !== null ? $RO->getAddressById( $sellerId ) : '';
+            $buyerAddr = $buyerId !== null ? $RO->getAddressById( $buyerId ) : '';
+
+            $json[] = [
+                'id' => $txid,
+                'txkey' => $txkey,
+                'price' => (int)$row['price'],
+                'amount' => (int)$row['amount'],
+                'total' => (int)$row['total'],
+                'side' => $row['side'],
+                'timestamp' => (int)$row['timestamp'],
+                'seller' => $sellerAddr,
+                'buyer' => $buyerAddr
+            ];
+        }
+
+        apiexit( 200, $json );
+    }
+    else
     if( $f === 'balance' && $arg !== false )
     {
         $address = $arg;

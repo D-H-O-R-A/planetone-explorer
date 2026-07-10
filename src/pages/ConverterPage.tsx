@@ -22,7 +22,7 @@ import {
   RefreshCw,
   Plus
 } from 'lucide-react';
-import { getNodeUrl, getEthNodeUrl, getChainId, getChainIdLetter, getCoinName, getExplorerUrl, isTestnet } from "@/lib/utils";
+import { getNodeUrl, getEthNodeUrl, getDataServiceUrl, getChainId, getChainIdLetter, getCoinName, getExplorerUrl, isTestnet } from "@/lib/utils";
 import { wavesAsset2Eth, ethTxId2waves, wavesAddress2eth, ethAddress2waves } from '@better2better/waves-node-api-js';
 import { toast } from 'sonner';
 
@@ -556,6 +556,22 @@ const ConverterPage = () => {
                   onClick={() => handleCopy(getExplorerUrl(), 'URL do Explorer')}
                 >
                   {copiedText === getExplorerUrl() ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                </Button>
+              </div>
+            </div>
+
+            {/* Data Service URL */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">URL do Data Service (Waves API)</span>
+              <div className="flex items-center justify-between gap-2 bg-muted/40 p-2.5 rounded-xl border border-border">
+                <code className="font-mono text-xs text-foreground truncate select-all">{getDataServiceUrl()}</code>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 hover:bg-muted" 
+                  onClick={() => handleCopy(getDataServiceUrl(), 'URL do Data Service')}
+                >
+                  {copiedText === getDataServiceUrl() ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
                 </Button>
               </div>
             </div>

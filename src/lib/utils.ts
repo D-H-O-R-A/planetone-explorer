@@ -9,6 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 // Constants for blockchain node connections
 export const NODE_URL = 'https://nodes.planetone.io';
 export const ETH_NODE_URL = 'https://rpc.planetone.io';
+export const DATA_SERVICE_URL = 'https://data-service.planetone.io';
 export const CHAIN_ID = 80; // Planet One Blockchain ID
 export const EXPLORER_URL = 'https://explorer.planetone.io';
 export const CHAIN_ID_LETTER = 'P'; // Chain ID letter for Planet One SDK
@@ -16,6 +17,7 @@ export const CHAIN_ID_LETTER = 'P'; // Chain ID letter for Planet One SDK
 // Testnet constants
 export const TESTNET_NODE_URL = 'https://nodes-testnet.planetone.io';
 export const TESTNET_ETH_NODE_URL = 'https://rpc-testnet.planetone.io';
+export const TESTNET_DATA_SERVICE_URL = 'https://data-service.planetone.io';
 export const TESTNET_CHAIN_ID = 'S'; // Testnet Chain ID
 export const TESTNET_EXPLORER_URL = 'https://testnet-explorer.planetone.io';
 
@@ -62,6 +64,11 @@ export const getNodeUrl = (): string => {
 export const getEthNodeUrl = (): string => {
   if (isTestnet()) return TESTNET_ETH_NODE_URL;
   return localStorage.getItem('custom_eth_node_url') || ETH_NODE_URL;
+};
+
+export const getDataServiceUrl = (): string => {
+  if (isTestnet()) return TESTNET_DATA_SERVICE_URL;
+  return localStorage.getItem('custom_data_service_url') || DATA_SERVICE_URL;
 };
 
 export const getChainId = (): number => {

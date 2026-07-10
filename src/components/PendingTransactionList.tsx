@@ -57,7 +57,17 @@ const PendingTransactionList: React.FC<PendingTransactionListProps> = ({ limit =
       // Load asset details for metadata
       const uniqueAssetIds = Array.from(new Set(
         pendingList
-          .flatMap(tx => [tx.assetId, tx.feeAsset])
+          .flatMap(tx => {
+            const ids = [tx.assetId, tx.feeAsset];
+            if (tx.type === 3) {
+              ids.push(tx.assetId || tx.id);
+            }
+            if (tx.type === 7 && tx.order1?.assetPair) {
+              if (tx.order1.assetPair.amountAsset) ids.push(tx.order1.assetPair.amountAsset);
+              if (tx.order1.assetPair.priceAsset) ids.push(tx.order1.assetPair.priceAsset);
+            }
+            return ids;
+          })
           .filter((id): id is string => !!id)
       ));
 
@@ -139,13 +149,37 @@ const PendingTransactionList: React.FC<PendingTransactionListProps> = ({ limit =
   return (
     <div className="space-y-3">
       {transactions.map((tx) => {
-        const amountAssetId = tx.assetId;
-        const amountDecimals = amountAssetId ? (assetMap[amountAssetId]?.decimals ?? 8) : 8;
-        const amountSymbol = amountAssetId ? (assetMap[amountAssetId]?.name ?? amountAssetId.substring(0, 4).toUpperCase()) : getCoinName();
+        const getAssetDecimals = (id: string | null | undefined, fallback = 8) => {
+          if (!id) return fallback;
+          return assetMap[id]?.decimals ?? fallback;
+        };
+
+        const getAssetSymbol = (id: string | null | undefined, fallback = getCoinName()) => {
+          if (!id) return fallback;
+          return assetMap[id]?.name ?? id.substring(0, 4).toUpperCase();
+        };
+
+        // Resolve amount decimals & symbol & value
+        let amountAssetId = tx.assetId;
+        let amountDecimals = getAssetDecimals(amountAssetId, 8);
+        let amountSymbol = getAssetSymbol(amountAssetId, getCoinName());
+        let displayAmount = tx.amount;
+
+        if (tx.type === 3) { // Issue
+          const assetId = tx.assetId || tx.id;
+          amountDecimals = getAssetDecimals(assetId, 8);
+          amountSymbol = getAssetSymbol(assetId, tx.name || 'Token');
+          displayAmount = tx.quantity;
+        } else if (tx.type === 7) { // Exchange
+          amountAssetId = tx.order1?.assetPair?.amountAsset;
+          amountDecimals = getAssetDecimals(amountAssetId, 8);
+          amountSymbol = getAssetSymbol(amountAssetId, amountAssetId ? amountAssetId.substring(0, 6).toUpperCase() : 'Token');
+          displayAmount = tx.amount;
+        }
 
         const feeAssetId = tx.feeAsset;
-        const feeDecimals = feeAssetId ? (assetMap[feeAssetId]?.decimals ?? 8) : 8;
-        const feeSymbol = feeAssetId ? (assetMap[feeAssetId]?.name ?? feeAssetId.substring(0, 4).toUpperCase()) : getCoinName();
+        const feeDecimals = getAssetDecimals(feeAssetId, 8);
+        const feeSymbol = getAssetSymbol(feeAssetId, getCoinName());
 
         return (
           <Card key={tx.id} className="glass-card hover:bg-muted/50 transition-colors border-amber-500/10 dark:border-amber-500/15 hover:border-amber-500/30">
@@ -172,35 +206,72 @@ const PendingTransactionList: React.FC<PendingTransactionListProps> = ({ limit =
                         {tx.id.slice(0, 10)}...{tx.id.slice(-6)}
                       </Link>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">From:</span>
-                      <Link 
-                        to={`/address/${tx.sender}`}
-                        className="text-xs text-primary hover:underline truncate font-mono"
-                      >
-                        {`${tx.sender.slice(0, 6)}...${tx.sender.slice(-4)}`}
-                      </Link>
-                    </div>
-                    
-                    {tx.recipient && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">To:</span>
-                        <Link 
-                          to={`/address/${tx.recipient}`}
-                          className="text-xs text-primary hover:underline truncate font-mono"
-                        >
-                          {`${tx.recipient.slice(0, 6)}...${tx.recipient.slice(-4)}`}
-                        </Link>
+
+                    {tx.type === 7 && tx.order1 && tx.order2 ? (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-muted-foreground">Comprador:</span>
+                          <Link 
+                            to={`/address/${tx.order1.orderType === 'buy' ? tx.order1.sender : tx.order2.sender}`}
+                            className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline truncate font-mono font-medium"
+                          >
+                            {tx.order1.orderType === 'buy' ? `${tx.order1.sender.slice(0, 8)}...${tx.order1.sender.slice(-6)}` : `${tx.order2.sender.slice(0, 8)}...${tx.order2.sender.slice(-6)}`}
+                          </Link>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-muted-foreground">Vendedor:</span>
+                          <Link 
+                            to={`/address/${tx.order1.orderType === 'sell' ? tx.order1.sender : tx.order2.sender}`}
+                            className="text-[11px] text-amber-600 dark:text-amber-400 hover:underline truncate font-mono font-medium"
+                          >
+                            {tx.order1.orderType === 'sell' ? `${tx.order1.sender.slice(0, 8)}...${tx.order1.sender.slice(-6)}` : `${tx.order2.sender.slice(0, 8)}...${tx.order2.sender.slice(-6)}`}
+                          </Link>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">From:</span>
+                          <Link 
+                            to={`/address/${tx.sender}`}
+                            className="text-xs text-primary hover:underline truncate font-mono"
+                          >
+                            {`${tx.sender.slice(0, 6)}...${tx.sender.slice(-4)}`}
+                          </Link>
+                        </div>
+                        {tx.recipient && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">To:</span>
+                            <Link 
+                              to={`/address/${tx.recipient}`}
+                              className="text-xs text-primary hover:underline truncate font-mono"
+                            >
+                              {`${tx.recipient.slice(0, 6)}...${tx.recipient.slice(-4)}`}
+                            </Link>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {tx.type === 3 && (
+                      <div className="text-[11px] text-muted-foreground italic font-normal mt-1 bg-emerald-500/5 p-1.5 rounded-lg border border-emerald-500/10 max-w-md">
+                        Criação do token <strong className="text-foreground">{tx.name}</strong>: {tx.description || "Nenhuma descrição fornecida."}
                       </div>
                     )}
                   </div>
                 </div>
                 
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  {tx.amount !== undefined && (
+                  {displayAmount !== undefined && (
                     <div className="text-xs font-semibold font-mono">
-                      {(tx.amount / Math.pow(10, amountDecimals)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}{" "}
+                      {(displayAmount / Math.pow(10, amountDecimals)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}{" "}
                       <span className="text-primary font-bold text-[10px] uppercase">{amountSymbol}</span>
+                    </div>
+                  )}
+                  {tx.type === 7 && tx.price !== undefined && (
+                    <div className="text-[9px] text-muted-foreground font-mono mt-0.5">
+                      Preço: {(tx.price / Math.pow(10, 8 + (tx.order1?.assetPair?.priceAsset ? (assetMap[tx.order1.assetPair.priceAsset]?.decimals ?? 8) : 8) - amountDecimals)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 })}{" "}
+                      <span className="text-[9px] uppercase font-bold">PLO</span>
                     </div>
                   )}
                   {tx.fee !== undefined && (

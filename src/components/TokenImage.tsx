@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 interface TokenImageProps {
   assetId: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   className?: string;
   fallback?: React.ReactNode;
 }
@@ -36,6 +36,7 @@ export const TokenImage = ({ assetId, size = "md", className = "", fallback = nu
   if (hasError || !imgUrl) return <>{fallback}</>;
 
   const sizeClasses = {
+    xs: "w-4 h-4 rounded",
     sm: "w-6 h-6 rounded-lg",
     md: "w-10 h-10 rounded-xl",
     lg: "w-14 h-14 rounded-2xl"

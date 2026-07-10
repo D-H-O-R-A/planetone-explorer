@@ -92,6 +92,45 @@ class BlockchainParser
         $this->workheight = -1;
         $this->resetMTS(); // debug only
         $this->qps = []; // version 3 exchange price multipliers
+
+        // Initialize market trades indexing database
+        $this->db->db->exec( 'CREATE TABLE IF NOT EXISTS market_trades (
+            txkey INTEGER PRIMARY KEY,
+            amount_asset INTEGER,
+            price_asset INTEGER,
+            price INTEGER,
+            amount INTEGER,
+            total INTEGER,
+            side TEXT,
+            timestamp INTEGER,
+            seller INTEGER,
+            buyer INTEGER
+        )' );
+        $this->db->db->exec( 'CREATE INDEX IF NOT EXISTS idx_market_trades ON market_trades (amount_asset, price_asset, txkey DESC)' );
+
+        // If market_trades table is empty, perform a one-time automatic back-fill migration from the pts table
+        $count = (int)$this->db->db->query( 'SELECT COUNT(*) FROM market_trades' )->fetchColumn();
+        if( $count === 0 )
+        {
+            $this->db->db->exec( '
+                INSERT OR IGNORE INTO market_trades (txkey, amount_asset, price_asset, price, amount, total, side, timestamp, seller, buyer)
+                SELECT p1.r1 as txkey, 
+                       p1.r5 as amount_asset, 
+                       p2.r5 as price_asset, 
+                       CAST((p2.r6 * 100000000.0) / p1.r6 AS INTEGER) as price, 
+                       p1.r6 as amount, 
+                       p2.r6 as total, 
+                       \'buy\' as side, 
+                       (SELECT r2 FROM hs WHERE r0 = (p1.r1 >> 32) LIMIT 1) * 1000 as timestamp,
+                       p1.r3 as seller,
+                       p1.r4 as buyer
+                FROM pts p1
+                JOIN pts p2 ON p1.r1 = p2.r1 
+                WHERE p1.r2 = 7 
+                  AND p1.r10 IN (SELECT r0 FROM groups WHERE r1 LIKE \'>%:%\')
+                  AND p2.r10 IN (SELECT r0 FROM groups WHERE r1 LIKE \'<%:%\')
+            ' );
+        }
     }
 
     public function resetMTS()
@@ -883,6 +922,15 @@ class BlockchainParser
                 GROUP =>    $this->getGroupExchange( '<', $basset, $sasset ),
             ] );
         }
+
+        // Insert into market_trades database for direct trade history indexing
+        $order1 = $tx['order1'];
+        $order2 = $tx['order2'];
+        $taker = ( $order1['timestamp'] >= $order2['timestamp'] ) ? $order1 : $order2;
+        $side = $taker['orderType'];
+
+        $stmt = $this->db->db->prepare( 'INSERT OR REPLACE INTO market_trades (txkey, amount_asset, price_asset, price, amount, total, side, timestamp, seller, buyer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' );
+        $stmt->execute( [ $txkey, $basset, $sasset, $price, $bamount, $samount, $side, $tx['timestamp'], $sa, $ba ] );
     }
 
     private function processTransferTransaction( $txkey, $tx )
@@ -1552,6 +1600,7 @@ class BlockchainParser
 
         // PTS
         $this->pts->query( 'DELETE FROM pts WHERE r1 >= '. $txfrom );
+        $this->db->db->exec( 'DELETE FROM market_trades WHERE txkey >= '. $txfrom );
         $this->sponsorships->reset();
         $this->leases->reset();
         $this->setHighs();
