@@ -236,24 +236,32 @@ if( $address === 'api' )
         $amountAsset = $arg2;
         $priceAsset = $arg3;
 
-        $amountAssetId = ( $amountAsset === 'Waves' || $amountAsset === 'PLO' || $amountAsset === 'WAVES' ) ? 0 : $RO->getIdByAsset( $amountAsset );
-        $priceAssetId = ( $priceAsset === 'Waves' || $priceAsset === 'PLO' || $priceAsset === 'WAVES' ) ? 0 : $RO->getIdByAsset( $priceAsset );
+        $resolveAssetId = function( $RO, $asset ) {
+            $assetLower = strtolower( $asset );
+            if( $assetLower === 'waves' || $assetLower === 'plo' || $assetLower === 'amzx' || $asset === '0' || $asset === 0 )
+                return 0;
+            return $RO->getIdByAsset( $asset );
+        };
 
-        if( $amountAssetId === false || $priceAssetId === false )
+        $idA = $resolveAssetId( $RO, $amountAsset );
+        $idB = $resolveAssetId( $RO, $priceAsset );
+
+        if( $idA === false || $idB === false )
         {
             apiexit( 404, [ 'code' => 404, 'message' => 'asset not found' ] );
         }
 
-        // Fetch the trades!
+        // Fetch the trades with bidirectional support (A/B or B/A)
         $query = $RO->db->db->prepare( '
-            SELECT txkey, price, amount, total, side, timestamp, seller, buyer
+            SELECT txkey, amount_asset, price_asset, price, amount, total, side, timestamp, seller, buyer
             FROM market_trades 
-            WHERE amount_asset = :amount_asset AND price_asset = :price_asset 
+            WHERE (amount_asset = :idA AND price_asset = :idB)
+               OR (amount_asset = :idB AND price_asset = :idA)
             ORDER BY txkey DESC 
             LIMIT 100
         ' );
         
-        if( false === $query->execute( [ ':amount_asset' => $amountAssetId, ':price_asset' => $priceAssetId ] ) )
+        if( false === $query->execute( [ ':idA' => $idA, ':idB' => $idB ] ) )
             apiexit( 500, [ 'code' => 500, 'message' => 'query failed' ] );
 
         $trades = $query->fetchAll();
@@ -278,7 +286,9 @@ if( $address === 'api' )
                 'side' => $row['side'],
                 'timestamp' => (int)$row['timestamp'],
                 'seller' => $sellerAddr,
-                'buyer' => $buyerAddr
+                'buyer' => $buyerAddr,
+                'amount_asset' => (int)$row['amount_asset'],
+                'price_asset' => (int)$row['price_asset']
             ];
         }
 

@@ -127,8 +127,9 @@ class BlockchainParser
                 FROM pts p1
                 JOIN pts p2 ON p1.r1 = p2.r1 
                 WHERE p1.r2 = 7 
-                  AND p1.r10 IN (SELECT r0 FROM groups WHERE r1 LIKE \'>%:%\')
-                  AND p2.r10 IN (SELECT r0 FROM groups WHERE r1 LIKE \'<%:%\')
+                  AND p2.r2 = 7
+                  AND p1.r10 IN (SELECT r0 FROM groups WHERE SUBSTR(r1, 1, 1) = \'>\')
+                  AND p2.r10 IN (SELECT r0 FROM groups WHERE SUBSTR(r1, 1, 1) = \'<\')
             ' );
         }
     }
