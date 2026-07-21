@@ -180,6 +180,12 @@ find . -type f \( -name "*.php" -o -name "*.html" -o -name "*.js" -o -name "*.cs
     # Restore WAVES_ASSET and WAVES_LEASE_ASSET declarations in common.php to prevent duplicate PHP constant definition errors
     sed -i "s/PLO_ASSET = PLO_ASSET/WAVES_ASSET = PLO_ASSET/g" "$file" 2>/dev/null || true
     sed -i "s/PLO_LEASE_ASSET = PLO_LEASE_ASSET/WAVES_LEASE_ASSET = PLO_LEASE_ASSET/g" "$file" 2>/dev/null || true
+
+    # Restore method names, state endpoints, and repository URLs modified by 'Waves' replacement
+    sed -i "s/getAllPlanet One/getAllWaves/g" "$file" 2>/dev/null || true
+    sed -i "s/\/debug\/statePlanet One/\/debug\/stateWaves/g" "$file" 2>/dev/null || true
+    sed -i "s/Planet Oneplatform\/Planet One-community/wavesplatform\/waves-community/g" "$file" 2>/dev/null || true
+    sed -i "s/opinion of Planet One Community.csv/opinion of Waves Community.csv/g" "$file" 2>/dev/null || true
 done
 
 log_success "Global search-and-replace completed. All user-visible labels are branded for Planet One."
