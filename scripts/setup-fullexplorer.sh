@@ -176,6 +176,10 @@ find . -type f \( -name "*.php" -o -name "*.html" -o -name "*.js" -o -name "*.cs
     # Restore the WavesKit class identifier used by PHP/composer library
     sed -i "s/Planet OneKit/WavesKit/g" "$file" 2>/dev/null || true
     sed -i "s/Planet Onekit/WavesKit/g" "$file" 2>/dev/null || true
+
+    # Restore WAVES_ASSET and WAVES_LEASE_ASSET declarations in common.php to prevent duplicate PHP constant definition errors
+    sed -i "s/PLO_ASSET = PLO_ASSET/WAVES_ASSET = PLO_ASSET/g" "$file" 2>/dev/null || true
+    sed -i "s/PLO_LEASE_ASSET = PLO_LEASE_ASSET/WAVES_LEASE_ASSET = PLO_LEASE_ASSET/g" "$file" 2>/dev/null || true
 done
 
 log_success "Global search-and-replace completed. All user-visible labels are branded for Planet One."
