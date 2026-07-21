@@ -158,7 +158,7 @@ fi
 # 4. Global Debranding of Waves & AMZ
 log_info "Running global search-and-replace to de-brand 'Waves' / 'AMZ' in all indexer source files..."
 
-find . -type f \( -name "*.php" -o -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.md" \) -not -path "*/.git/*" | while read -r file; do
+find . -type f \( -name "*.php" -o -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.md" \) -not -path "*/.git/*" -not -path "*/vendor/*" -not -path "*/var/*" | while read -r file; do
     # Replace Waves with Planet One (except for library paths or variables that shouldn't change, but let's be thorough and replace visual labels)
     sed -i "s/Waves Explorer/Planet One FullExplorer/g" "$file" 2>/dev/null || true
     sed -i "s/Waves nodes/Planet One Nodes/g" "$file" 2>/dev/null || true
@@ -172,6 +172,10 @@ find . -type f \( -name "*.php" -o -name "*.html" -o -name "*.js" -o -name "*.cs
     sed -i "s/AMZ/PLO/g" "$file" 2>/dev/null || true
     sed -i "s/AMZX/PLO/g" "$file" 2>/dev/null || true
     sed -i "s/Amazonic/Planet One/g" "$file" 2>/dev/null || true
+
+    # Restore the WavesKit class identifier used by PHP/composer library
+    sed -i "s/Planet OneKit/WavesKit/g" "$file" 2>/dev/null || true
+    sed -i "s/Planet Onekit/WavesKit/g" "$file" 2>/dev/null || true
 done
 
 log_success "Global search-and-replace completed. All user-visible labels are branded for Planet One."
