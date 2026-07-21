@@ -8,7 +8,7 @@ export const GlobalMetricsCards = () => {
   useEffect(() => {
     const getSupply = async () => {
       try {
-        const details = await fetchAssetDetails("44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z");
+        const details = await fetchAssetDetails("AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk");
         if (details && details.quantity) {
           const supply = details.quantity / Math.pow(10, details.decimals || 4);
           setVerdeSupply(`${supply.toLocaleString('pt-BR')} VERDE`);

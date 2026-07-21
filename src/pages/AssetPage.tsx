@@ -38,7 +38,7 @@ interface AssetSocialMetadata {
 }
 
 const VERIFIED_ASSETS_METADATA: Record<string, AssetSocialMetadata> = {
-  "44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z": {
+  "AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk": {
     website: "https://planetone.io",
     twitter: "https://x.com/planetone_io",
     telegram: "https://t.me/planetone_io",
@@ -68,7 +68,7 @@ const AssetPage = () => {
   // Copy clipboards index tracker
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const VERDE_CONTRACT_ID = "44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z";
+  const VERDE_CONTRACT_ID = "AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk";
   const isVerde = asset?.assetId === VERDE_CONTRACT_ID;
 
   const [imgUrl, setImgUrl] = useState<string | null>(null);

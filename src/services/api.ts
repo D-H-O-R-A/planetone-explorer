@@ -654,7 +654,7 @@ export const fetchAssetData = async (assetId: string | null | undefined): Promis
   }
 
   // Resolve 'VERDE' alias to its actual contract/asset ID
-  const targetAssetId = assetId === 'VERDE' ? '44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z' : assetId;
+  const targetAssetId = assetId === 'VERDE' ? 'AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk' : assetId;
 
   // 1. Try our Full Explorer PHP proxy first to bypass CORS
   const fullExplorerUrl = getFullExplorerApiUrl();
@@ -1034,7 +1034,7 @@ export const fetchDecimalsAsset = async (assetId: string | null | undefined): Pr
   if (!assetId || assetId === 'null' || assetId === 'undefined' || assetId === 'WAVES' || assetId === 'PLO') {
     return 8;
   }
-  const targetAssetId = assetId === 'VERDE' ? '44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z' : assetId;
+  const targetAssetId = assetId === 'VERDE' ? 'AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk' : assetId;
   const apiUrl = getGCSApiUrl();
   const response = await fetch(`${apiUrl}/assets/details/${targetAssetId}`);
   if (!response.ok) {

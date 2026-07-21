@@ -92,9 +92,9 @@ const RankingPage: React.FC = () => {
           }
         } catch (err) {
           console.error("Failed to resolve asset details via Node API:", err);
-          if (assetKey === "VERDE" || assetKey === "44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z") {
+          if (assetKey === "VERDE" || assetKey === "AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk") {
             // Safe fallback constants for VERDE on mainnet/testnet
-            targetAssetId = "44ACzz1bbVgM9uxEBBqQrzRodtbs4AE3qSbbn1Q25u4Z";
+            targetAssetId = "AAyf6hiqW17aivtcdY34eFx2GobqnkdSx4Pj5U8S5nfk";
             decimals = 4;
             name = "VERDE";
             totalSupply = 1153688786;
