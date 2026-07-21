@@ -96,11 +96,62 @@ elif [ ! -f "config.php" ]; then
     log_warning "config.sample.php not found. Creating default config.php..."
     cat << 'EOF' > config.php
 <?php
-define( 'W8IO_NODE', 'https://nodes.planetone.io' );
-define( 'W8IO_COIN', 'PLO' );
-define( 'W8IO_NETWORK', 'P' ); // Mainnet 'P'
-define( 'W8IO_DB_DIR', __DIR__ . '/db/' );
-define( 'W8IO_LIMIT', 100 );
+require_once __DIR__ . '/include/w8_error_handler.php';
+require_once __DIR__ . '/vendor/autoload.php';
+use deemru\WavesKit;
+
+date_default_timezone_set( 'UTC' );
+
+function wk( $full = true ) : WavesKit
+{
+    static $wk;
+    if( !isset( $wk ) )
+    {
+        $wk = new WavesKit( W8IO_NETWORK, [ 'w', 'e', 'i', 's' ] );
+        if( $full )
+        {
+            define( 'WK_CURL_SETBESTONERROR', true );
+            $wk->setNodeAddress( W8IO_NODES, 0 );
+            $wk->setCryptash( 'PLANETONE_SECRET_STRING_KEY' );
+        }
+    }
+    return $wk;
+}
+
+function mwk()
+{
+    static $wk;
+    if( !isset( $wk ) )
+    {
+        $wk = new WavesKit( W8IO_NETWORK, [ 'w', 'e', 'i', 's' ] );
+        $nodes = W8IO_MULTI_NODES;
+        shuffle( $nodes );
+        $wk->setNodeAddress( $nodes, 0 );
+    }
+    return $wk;
+}
+
+function w8_err( $message = '(no message)' )
+{
+    if( isset( $_SERVER['REQUEST_URI'] ) )
+        $message .= ' (' . $_SERVER['REQUEST_URI'] . ')';
+    trigger_error( $message, E_USER_ERROR );
+}
+
+define( 'W8IO_DB_DIR', __DIR__ . '/var/db/' );
+define( 'W8IO_DB_PATH', W8IO_DB_DIR . 'blockchain.sqlite3' );
+define( 'W8DB', 'sqlite:' . W8IO_DB_PATH );
+
+define( 'W8IO_NODES', [ 'https://nodes.planetone.io' ] );
+define( 'W8IO_MULTI_NODES', [ 'https://nodes.planetone.io' ] );
+define( 'W8IO_MATCHER', 'https://matcher.planetone.io' );
+define( 'W8IO_NETWORK', 'P' ); // 'W' -- mainnet, 'T' -- testnet
+define( 'W8IO_ROOT', '/' );
+define( 'W8IO_MAX_UPDATE_BATCH', 1 );
+define( 'W8IO_UPDATE_DELAY', 1 );
+define( 'W8IO_UPDATE_PROCS', 1 );
+define( 'WK_CURL_TIMEOUT', 15 );
+define( 'W8IO_MAX_MEMORY', 1024 * 1024 * 1024 );
 EOF
 fi
 
