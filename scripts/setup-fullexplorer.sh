@@ -13,6 +13,7 @@ color_primary="\033[1;34m"   # Blue
 color_accent="\033[1;32m"    # Green
 color_warning="\033[1;33m"   # Yellow
 color_error="\033[1;31m"     # Red
+color_bold="\033[1m"         # Bold
 color_reset="\033[0m"
 
 log_info() {
@@ -50,7 +51,7 @@ for cmd in git php sed curl; do
 done
 log_success "All system dependencies are present."
 
-# 2. Clone the D-H-O-R-A/planetone-explorer repository if not already cloned
+# 2. Clone/Restore the FullExplorer files into target folder
 if [ -d "$TARGET_DIR" ]; then
     echo -e "${color_warning}A instalação anterior do FullExplorer foi detectada em:${color_reset} $TARGET_DIR"
     read -p "Deseja APAGAR a instalação anterior e fazer uma instalação 100% LIMPA? (y/N): " CLEAN_CHOICE
@@ -61,13 +62,25 @@ if [ -d "$TARGET_DIR" ]; then
 fi
 
 if [ ! -d "$TARGET_DIR" ]; then
-    log_info "Cloning D-H-O-R-A/planetone-explorer blockchain indexer into '${TARGET_DIR}'..."
-    git clone https://github.com/D-H-O-R-A/planetone-explorer.git "$TARGET_DIR"
-    log_success "Successfully cloned D-H-O-R-A/planetone-explorer."
+    log_info "Restoring a clean copy of the FullExplorer files..."
+    
+    # Try restoring from parent Git repository if available
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+        log_info "Restoring from parent Git repository..."
+        git checkout HEAD -- fullexplorer 2>/dev/null || true
+    fi
+
+    # If it is still missing, do a clean extraction clone
+    if [ ! -d "$TARGET_DIR" ]; then
+        log_info "Cloning and extracting the indexer files..."
+        TEMP_CLONE=$(mktemp -d)
+        git clone --depth 1 https://github.com/D-H-O-R-A/planetone-explorer.git "$TEMP_CLONE"
+        mv "$TEMP_CLONE/fullexplorer" "$TARGET_DIR"
+        rm -rf "$TEMP_CLONE"
+    fi
+    log_success "Successfully restored FullExplorer files."
 else
-    log_info "Target directory '${TARGET_DIR}' already exists. Pulling latest changes..."
-    cd "$TARGET_DIR"
-    git pull || log_warning "Failed to pull latest changes from git. Continuing with existing code."
+    log_info "Target directory '${TARGET_DIR}' already exists. Continuing..."
 fi
 
 cd "$TARGET_DIR"

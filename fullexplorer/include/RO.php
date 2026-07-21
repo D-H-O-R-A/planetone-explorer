@@ -9,6 +9,7 @@ use deemru\Triples;
 class RO
 {
     public Triples $db;
+    public bool $isReady = false;
 
     public function __construct( $db )
     {
@@ -17,6 +18,14 @@ class RO
         $this->db->db->exec( 'PRAGMA synchronous = NORMAL' );
         $this->db->db->exec( 'PRAGMA cache_size = -100000' ); // 100MB of cache
         $this->db->db->exec( 'PRAGMA temp_store = MEMORY' );
+
+        try {
+            $tableCheck = $this->db->db->query( "SELECT name FROM sqlite_master WHERE type='table' AND name='pts'" )->fetch();
+            if( $tableCheck !== false )
+                $this->isReady = true;
+        } catch( \Exception $e ) {
+            $this->isReady = false;
+        }
     }
 
     private $getTxKeyByTxId;
@@ -259,6 +268,9 @@ class RO
 
     public function getGenerators( $blocks, $start = null )
     {
+        if( !$this->isReady )
+            return [];
+
         if( !isset( $start ) )
             $start = $this->getLastHeightTimestamp()[0] - $blocks;
 
@@ -285,6 +297,9 @@ class RO
 
     public function getGeneratorsFees( $blocks, $start = null )
     {
+        if( !$this->isReady )
+            return [];
+
         if( isset( $start ) )
         {
             $start = w8h2kg( $start );
@@ -315,6 +330,9 @@ class RO
 
     public function getTimestampByHeight( $height )
     {
+        if( !$this->isReady )
+            return false;
+
         if( !isset( $this->getTimestampByHeight ) )
         {
             $this->getTimestampByHeight = $this->db->db->prepare( 'SELECT r2 FROM hs WHERE r0 = ?' );
@@ -334,6 +352,9 @@ class RO
 
     public function getLastHeightTimestamp()
     {
+        if( !$this->isReady )
+            return false;
+
         $r = $this->db->db->query( 'SELECT * FROM hs ORDER BY r0 DESC LIMIT 1' )->fetchAll();
         if( isset( $r[0] ) )
             return [ (int)$r[0][0], (int)$r[0][2] ];

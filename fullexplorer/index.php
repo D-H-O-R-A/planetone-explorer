@@ -722,6 +722,52 @@ function prettyAddress( $address )
     return $address;
 }
 
+function w8io_print_sync_pending()
+{
+    prolog();
+    echo '
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; text-align: center; font-family: \'Outfit\', \'Inter\', sans-serif; padding: 20px;">
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 40px; max-width: 540px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.3); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
+            <!-- Ambient background glow -->
+            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0, 255, 204, 0.05) 0%, rgba(0, 153, 255, 0.02) 50%, transparent 100%); pointer-events: none; z-index: 0;"></div>
+            
+            <!-- Spinning loading circle -->
+            <div style="position: relative; z-index: 1; display: inline-block; margin-bottom: 30px;">
+                <svg width="80" height="80" viewBox="0 0 80 80" style="animation: spin 2s linear infinite;">
+                    <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,0.05)" stroke-width="4" fill="none" />
+                    <circle cx="40" cy="40" r="34" stroke="url(#spinner-gradient)" stroke-width="4" stroke-dasharray="160 50" fill="none" stroke-linecap="round" />
+                    <defs>
+                        <linearGradient id="spinner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00ffcc" />
+                            <stop offset="100%" stop-color="#0099ff" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; z-index: 1;">⚡</div>
+            </div>
+            
+            <h3 style="font-size: 26px; font-weight: 700; margin: 0 0 15px 0; background: linear-gradient(135deg, #00ffcc 0%, #0099ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; z-index: 1; letter-spacing: -0.5px;">Sincronização em Andamento</h3>
+            <p style="font-size: 15px; color: #a0aec0; line-height: 1.6; margin: 0 0 25px 0; position: relative; z-index: 1;">
+                O indexador do FullExplorer está reconstruindo o banco de dados a partir do bloco gênese da nova blockchain.
+            </p>
+            
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 255, 204, 0.06); border: 1px solid rgba(0, 255, 204, 0.15); border-radius: 12px; padding: 10px 20px; font-size: 13px; color: #00ffcc; font-weight: 500; position: relative; z-index: 1; animation: pulse 2s infinite;">
+                <span style="display: inline-block; width: 6px; height: 6px; background-color: #00ffcc; border-radius: 50%; animation: ping 1.5s infinite;"></span>
+                Aguardando blocos serem indexados...
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        @keyframes ping { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+    ';
+    exit();
+}
+
 if( strlen( $address ) > 36 )
 {
     $f = $address;
@@ -1685,6 +1731,8 @@ if( $address === 'GENERATORS' )
 
     require_once 'include/RO.php';
     $RO = new RO( W8DB );
+    if( !$RO->isReady )
+        w8io_print_sync_pending();
 
     $generators = $RO->getGeneratorsFees( $n, $arg );
 
@@ -2008,6 +2056,8 @@ else if( $f === 'data' )
 {
     require_once 'include/RO.php';
     $RO = new RO( W8DB );
+    if( !$RO->isReady )
+        w8io_print_sync_pending();
 
     $aid = $RO->getAddressIdByString( $address );
     if( $aid === false )
@@ -2071,6 +2121,9 @@ else
         require_once 'include/RO.php';
         $RO = new RO( W8DB );
     }
+
+    if( !$RO->isReady )
+        w8io_print_sync_pending();
 
     $aid = $RO->getAddressIdByString( $address );
 
